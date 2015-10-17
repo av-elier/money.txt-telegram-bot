@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  */
 public class MoneyTxtLine {
     private static final Pattern re = Pattern.compile(" *(\\d\\d\\d\\d\\.\\d\\d\\.\\d\\d) *(.*?) +([\\(\\)\\d\\+-\\.,\\*/]+)\\w*(.*)");
+    private static final Pattern reWithoutDate = Pattern.compile(" *(.*?) +([\\(\\)\\d\\+-\\.,\\*/]+)\\w*(.*)");
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
 
     private Optional<Date> date;
@@ -29,15 +30,26 @@ public class MoneyTxtLine {
 
     public MoneyTxtLine(String txtLine) throws ParseException {
         Matcher m = re.matcher(txtLine);
-        if (!m.matches())
+        Matcher mWD = reWithoutDate.matcher(txtLine);
+        if (!m.matches() && !mWD.matches()) {
             throw new ParseException("Pattern not matches", -1);
-        String sDate = m.group(1);
-        Date date = formatter.parse(sDate);
-        this.setDate(Optional.of(date));
-        this.setCategory(m.group(2));
-        this.setExpenseExpr(m.group(3));
-        this.setName( m.group(4) );
-        this.setHashtags(new HashSet<>());
+        }
+        if (m.matches()) {
+            String sDate = m.group(1);
+            Date date = formatter.parse(sDate);
+            this.setDate(Optional.of(date));
+            this.setCategory(m.group(2));
+            this.setExpenseExpr(m.group(3));
+            this.setName(m.group(4));
+            this.setHashtags(new HashSet<>());
+        } else if (mWD.matches()) {
+            Date date = Date.from(Instant.now());
+            this.setDate(Optional.of(date));
+            this.setCategory(mWD.group(1));
+            this.setExpenseExpr(mWD.group(2));
+            this.setName(mWD.group(3));
+            this.setHashtags(new HashSet<>());
+        }
     }
 
     public MoneyTxtLine(Optional<Date> date, String category, String expenseExpr, String name, Set<String> hashtags) {

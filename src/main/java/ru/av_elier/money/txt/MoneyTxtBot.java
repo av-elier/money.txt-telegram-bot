@@ -77,7 +77,7 @@ public class MoneyTxtBot {
             default:
                 states.put(u.message.chat.id, State.DEFAULT);
                 bot.sendMessage(u.message.chat.id,
-                        "HOW DID YOU GET THERE?? Wow! Go to default",
+                        "HOW DID YOU GET THERE?? Wow! Go back to default state",
                         null, null, null);
         }
     }
@@ -159,17 +159,22 @@ public class MoneyTxtBot {
     }
 
     private static void processUpdateCmdToday(TelegramBot bot, Update u) {
-        // TODO
         bot.sendMessage(u.message.chat.id,
-                "Please, ask later",
-                null, u.message.message_id, null);
-    }
-
-    private static void processUpdateCategoryReady(TelegramBot bot, Update u) {
-
+                "Date today (by the way, server 'today', not necessarily yours). Continue with category, exprassion" +
+                        " and comment (and tell @av_elier what these parts are, and how regexpr should look like)",
+                null, null, null);
+        states.put(u.message.chat.id, State.DEFAULT);
+//        states.put(u.message.chat.id, State.CATEGORY_READY);
     }
 
     private static void processUpdateDateReady(TelegramBot bot, Update u) {
+        bot.sendMessage(u.message.chat.id,
+                "no custom keyboard yet",
+                null, null, null);
+        states.put(u.message.chat.id, State.CATEGORY_READY);
+    }
+
+    private static void processUpdateCategoryReady(TelegramBot bot, Update u) {
 
     }
 
