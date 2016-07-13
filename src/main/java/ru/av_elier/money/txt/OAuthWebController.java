@@ -16,6 +16,13 @@ import java.util.Set;
  */
 public class OAuthWebController {
 
+    private static DbxRequestConfig config = new DbxRequestConfig(
+            "MoneyTxtBot/1.0", Locale.getDefault().toString());
+
+    public static DbxRequestConfig getConfig() {
+        return config;
+    }
+
     private String dbxWebAuth = null;
     DbxWebAuthNoRedirect webAuth = null;
 
@@ -27,8 +34,6 @@ public class OAuthWebController {
 
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 
-        DbxRequestConfig config = new DbxRequestConfig(
-                "MoneyTxtBot/1.0", Locale.getDefault().toString());
         webAuth = new DbxWebAuthNoRedirect(config, appInfo);
         String authorizeUrl = webAuth.start();
 

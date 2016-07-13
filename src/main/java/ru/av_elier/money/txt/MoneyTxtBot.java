@@ -1,5 +1,6 @@
 package ru.av_elier.money.txt;
 
+import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxException;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.TelegramBotAdapter;
@@ -10,6 +11,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
  */
 public class MoneyTxtBot {
     private static class Commands {
+        static String START = "/start";
         static String TODAY = "/today";
         static String DROPBOX = "/dropbox";
         static String LAST = "/last";
@@ -28,8 +31,6 @@ public class MoneyTxtBot {
 
 
     private static Integer latest_update = null;
-
-    private static final boolean DEBUG = false;
 
     public static void main(String[] args) throws InterruptedException {
         DbHelper.init();
@@ -83,27 +84,30 @@ public class MoneyTxtBot {
     }
 
     private static void processUpdateDefault(TelegramBot bot, Update u) {
-        if (DEBUG){ // response what we hear
-            String resp = String.format( "upd %d: from %d %s %s @%s - text: \"%s\"",
-                u.update_id, u.message.from.id, u.message.from.first_name, u.message.from.last_name,
-                u.message.from.username, u.message.text );
-            bot.sendMessage(u.message.chat.id,
-                    "We hear: " + resp,
-                    null, null, null);
-        }
-
         String updText = u.message.text;
-        if (updText.equals(Commands.DROPBOX)) {
+        if (updText == null)
+            return;
+        if (updText.startsWith(Commands.START)) {
+            processUpdateCmdStart(bot, u);
+        } else if (updText.startsWith(Commands.DROPBOX)) {
             processUpdateCmdDropbox(bot, u);
         }
         else if (updText.startsWith(Commands.LAST)) {
             processUpdateCmdLast(bot, u);
         }
-        else if (updText.equals(Commands.TODAY)) {
+        else if (updText.startsWith(Commands.TODAY)) {
             processUpdateCmdToday(bot, u);
         } else {
             processFullMoneyLine(bot, u);
         }
+    }
+
+    private static void processUpdateCmdStart(TelegramBot bot, Update u) {
+        OAuthWebController oauthControl = new OAuthWebController();
+        String authorizeUrl = oauthControl.getAuthUtl();
+        bot.sendMessage(u.message.chat.id,
+                "Hello. You need to link you /dropbox to store money.txt.",
+                null, null, null);
     }
 
     private static void processUpdateCmdDropbox(TelegramBot bot, Update u) {
@@ -123,6 +127,8 @@ public class MoneyTxtBot {
             DbHelper.Token token = new DbHelper.Token();
             token.chatId = u.message.chat.id;
             token.accessToken = accessToken;
+            DbxClient client = new DbxClient(OAuthWebController.getConfig(), accessToken);
+            Logger.getGlobal().info("Linked account: " + client.getAccountInfo().displayName);
             DbHelper.saveTokenForChatId(token);
             bot.sendMessage(u.message.chat.id,
                     "Dropbox connected, Yay!",
@@ -154,7 +160,7 @@ public class MoneyTxtBot {
         String lastList = last.stream().map(line -> line.toString()).collect(Collectors.joining("\n"));
 
         bot.sendMessage(u.message.chat.id,
-                String.format("Here is last %d records:\n\n", limit) + lastList,
+                String.format("Here are the last %d records:\n\n", limit) + lastList,
                 null, null, null);
     }
 
