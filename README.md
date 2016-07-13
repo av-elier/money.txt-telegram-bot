@@ -1,5 +1,8 @@
 # money.txt-telegram-bot
 
+This project only adds a way to edit money.txt file. Main _money.txt_ project is [**here**](https://github.com/arwer13/money.txt)
+
+
 Environment variables shoud contain something like this:
 ```
 BOT_TOKEN               <your_bot_token>
