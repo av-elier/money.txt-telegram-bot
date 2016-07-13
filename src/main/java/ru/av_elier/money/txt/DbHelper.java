@@ -38,7 +38,7 @@ public class DbHelper {
             TableUtils.createTableIfNotExists(connectionSource, Token.class);
             connectionSource.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            // EXISTS // e.printStackTrace();
         }
     }
 
