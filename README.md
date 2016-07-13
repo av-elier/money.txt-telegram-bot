@@ -2,6 +2,7 @@
 
 This project only adds a way to edit money.txt file. Main _money.txt_ project is [**here**](https://github.com/arwer13/money.txt)
 
+## Running
 
 Environment variables shoud contain something like this:
 ```
