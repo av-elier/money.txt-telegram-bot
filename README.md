@@ -17,6 +17,6 @@ DATABASE_USER           moneytxt
 To run this you need:
 - java8
 - to add database with some user (env: `DATABASE_URL`, `DATABASE_USER`, `DATABASE_PASS`)
-- to create a telegram bot (env: `DROPBOX_APP_KEY`)
+- to create a telegram bot (env: `BOT_TOKEN`)
 - to create a dropbox app (env: `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`)
 - to create manually money.txt in dropbox app folder after connecting to dropbox (why?)
